@@ -2087,9 +2087,9 @@ variables:
     common_name: locket.service.cf.internal
     extended_key_usage:
     - server_auth
-    alternative_names:
-    - "*.locket.service.cf.internal"
-    - locket.service.cf.internal
+    alternative_names: [ locket.service.cf.internal, "*.locket.service.cf.internal" ]
+  consumes:
+    alternative_name: { from: locket, link_type: locket }
 - name: diego_locket_client
   type: certificate
   options:
@@ -2267,3 +2267,5 @@ stemcells:
 - alias: default
   os: ubuntu-xenial
   version: "170.16"
+features:
+  use_link_dns_names: true
