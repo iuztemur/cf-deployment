@@ -1644,6 +1644,8 @@ instance_groups:
     properties:
       http:
         address: "0.0.0.0:8088"
+        cert: "((loggregator_rlp_gateway_tls.certificate))"
+        key: "((loggregator_rlp_gateway_tls.private_key))"
       logs_provider:
         ca_cert: "((loggregator_ca.certificate))"
         client_cert: "((loggregator_rlp_gateway.certificate))"
@@ -2003,6 +2005,11 @@ variables:
     common_name: rlp_gateway
     extended_key_usage:
     - client_auth
+- name: loggregator_rlp_gateway_tls
+  type: certificate
+  options:
+    ca: loggregator_ca
+    common_name: rlp_gateway_tls
 - name: adapter_rlp_tls
   type: certificate
   options:
