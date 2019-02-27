@@ -17,6 +17,7 @@ var standardTests = map[string]helpers.OpsFileTestParams{
 		Vars: []string{"default_router_group_reservable_ports=1234-2024"},
 	},
 	"disable-router-tls-termination.yml": {},
+	"router-tls-ca-signed-certificate.yml": {},
 	"enable-cc-rate-limiting.yml": {
 		Vars: []string{"cc_rate_limiter_general_limit=blah", "cc_rate_limiter_unauthenticated_limit=something"},
 	},
