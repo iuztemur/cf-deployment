@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"og/helpers"
+	"og/helpers/git"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -238,6 +239,24 @@ func TestSemantic(t *testing.T) {
 
 			return nil
 		})
+	})
+
+	t.Run("validate-ops-file-deletions", func(t *testing.T) {
+		version, err := git.GetMajorVersion()
+		if err != nil {
+			t.Fatalf("ADD ERROR HERE")
+		}
+
+		repo, err := git.CreateEmptyRepository()
+		if err != nil {
+			t.Fatalf("ADD ERROR HERE")
+		}
+
+		if err := git.CheckoutSubDirectory(repo, "operations", version); err != nil {
+			t.Fatalf("ADD ERROR HERE")
+		}
+
+		// Walk through temp and ensure all files exist in current operationsSubDirectory
 	})
 }
 
