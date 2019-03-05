@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/sergi/go-diff/diffmatchpatch"
+	gogit "gopkg.in/src-d/go-git.v4"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -242,17 +243,27 @@ func TestSemantic(t *testing.T) {
 	})
 
 	t.Run("validate-ops-file-deletions", func(t *testing.T) {
-		version, err := git.GetMajorVersion()
+		tempDir, err := ioutil.TempDir("", "cf-deployment-")
 		if err != nil {
 			t.Fatalf("ADD ERROR HERE")
 		}
 
-		repo, err := git.CreateEmptyRepository()
+		repo, err := gogit.PlainInit(tempDir, false)
+		if err != nil {
+			t.Fatalf("ADD ERROR HERE")
+		}
+		gitHelper := git.NewHelper(repo)
+
+		if err := gitHelper.SetupRepository(); err != nil {
+			t.Fatalf("ADD ERROR HERE")
+		}
+
+		version, err := gitHelper.GetMajorVersion()
 		if err != nil {
 			t.Fatalf("ADD ERROR HERE")
 		}
 
-		if err := git.CheckoutSubDirectory(repo, "operations", version); err != nil {
+		if err := gitHelper.CheckoutSubDirectory("operations", version); err != nil {
 			t.Fatalf("ADD ERROR HERE")
 		}
 
