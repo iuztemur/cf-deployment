@@ -8,6 +8,7 @@ import (
 	gita "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/config"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
+	"gopkg.in/src-d/go-git.v4/plumbing/storer"
 )
 
 type FakeRepository struct {
@@ -35,6 +36,18 @@ type FakeRepository struct {
 	}
 	logReturnsOnCall map[int]struct {
 		result1 object.CommitIter
+		result2 error
+	}
+	TagsStub        func() (storer.ReferenceIter, error)
+	tagsMutex       sync.RWMutex
+	tagsArgsForCall []struct {
+	}
+	tagsReturns struct {
+		result1 storer.ReferenceIter
+		result2 error
+	}
+	tagsReturnsOnCall map[int]struct {
+		result1 storer.ReferenceIter
 		result2 error
 	}
 	invocations      map[string][][]interface{}
@@ -167,6 +180,61 @@ func (fake *FakeRepository) LogReturnsOnCall(i int, result1 object.CommitIter, r
 	}{result1, result2}
 }
 
+func (fake *FakeRepository) Tags() (storer.ReferenceIter, error) {
+	fake.tagsMutex.Lock()
+	ret, specificReturn := fake.tagsReturnsOnCall[len(fake.tagsArgsForCall)]
+	fake.tagsArgsForCall = append(fake.tagsArgsForCall, struct {
+	}{})
+	fake.recordInvocation("Tags", []interface{}{})
+	fake.tagsMutex.Unlock()
+	if fake.TagsStub != nil {
+		return fake.TagsStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.tagsReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeRepository) TagsCallCount() int {
+	fake.tagsMutex.RLock()
+	defer fake.tagsMutex.RUnlock()
+	return len(fake.tagsArgsForCall)
+}
+
+func (fake *FakeRepository) TagsCalls(stub func() (storer.ReferenceIter, error)) {
+	fake.tagsMutex.Lock()
+	defer fake.tagsMutex.Unlock()
+	fake.TagsStub = stub
+}
+
+func (fake *FakeRepository) TagsReturns(result1 storer.ReferenceIter, result2 error) {
+	fake.tagsMutex.Lock()
+	defer fake.tagsMutex.Unlock()
+	fake.TagsStub = nil
+	fake.tagsReturns = struct {
+		result1 storer.ReferenceIter
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeRepository) TagsReturnsOnCall(i int, result1 storer.ReferenceIter, result2 error) {
+	fake.tagsMutex.Lock()
+	defer fake.tagsMutex.Unlock()
+	fake.TagsStub = nil
+	if fake.tagsReturnsOnCall == nil {
+		fake.tagsReturnsOnCall = make(map[int]struct {
+			result1 storer.ReferenceIter
+			result2 error
+		})
+	}
+	fake.tagsReturnsOnCall[i] = struct {
+		result1 storer.ReferenceIter
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -174,6 +242,8 @@ func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	defer fake.createRemoteMutex.RUnlock()
 	fake.logMutex.RLock()
 	defer fake.logMutex.RUnlock()
+	fake.tagsMutex.RLock()
+	defer fake.tagsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

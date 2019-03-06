@@ -1,14 +1,14 @@
 package git_test
 
 import (
-	"errors"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gstruct"
-
-	. "og/helpers/git"
-	"og/helpers/git/gitfakes"
+  "errors"
+  . "github.com/onsi/ginkgo"
+  . "github.com/onsi/gomega"
+  . "github.com/onsi/gomega/gstruct"
+  "gopkg.in/src-d/go-git.v4/plumbing"
+  "gopkg.in/src-d/go-git.v4/plumbing/storer"
+  . "og/helpers/git"
+  "og/helpers/git/gitfakes"
 )
 
 var _ = Describe("Git", func() {
@@ -71,44 +71,68 @@ var _ = Describe("Git", func() {
 	})
 
 	Describe("GetMajorVersion", func() {
-		// var (
-		// 	expectedVersion string
-		// 	expectedErr     error
-		// )
+		var (
+			expectedVersion string
+			expectedErr     error
+		)
 
 		JustBeforeEach(func() {
-			// expectedVersion, expectedErr = helper.GetMajorVersion()
+      reference := plumbing.NewReferenceFromStrings("DUMMY PLACEHOLDER REFERENCE","refs/tags/")
+			expectedVersion, expectedErr = helper.GetMajorVersion(reference)
 		})
 
-		// Context("when git returns a list of valid tag", func() {
-		// 	BeforeEach(func() {
-		// 		fake := new(gitfakes.FakeClient)
-		// 		fake.FetchContextReturns(nil)
+		Context("when git returns a list of valid tag", func() {
+			BeforeEach(func() {
+				fake := new(gitfakes.FakeRepository)
 
-		// 		client = fake
-		// 	})
+				reference1 := plumbing.NewReferenceFromStrings("v1.0.0","refs/tags/")
+        reference2 := plumbing.NewReferenceFromStrings("v1.0.1","refs/tags/")
 
-		// 	It("returns the most recent major version", func() {
-		// 		Expect(expectedErr).To(BeNil())
-		// 		Expect(expectedVersion).To(Equal("v1.0.0"))
-		// 	})
-		// })
+        tags := storer.NewReferenceSliceIter([]*plumbing.Reference{reference1, reference2})
 
-		// Context("when git returns an invalid tag", func() {})
+				fake.TagsReturns(tags, nil)
 
-		// Context("when git returns an error", func() {
-		// 	BeforeEach(func() {
-		// 		fake := new(gitfakes.FakeClient)
-		// 		fake.FetchContextReturns(errors.New("some error"))
+				//client = fake
+			})
 
-		// 		client = fake
-		// 	})
+			It("returns the most recent major version", func() {
+				Expect(expectedErr).To(BeNil())
+				Expect(expectedVersion).To(Equal("v1.0.0"))
+			})
+		})
 
-		// 	It("returns an error", func() {
-		// 		Expect(expectedErr).To(MatchError("some error"))
-		// 	})
-		// })
+		Context("when git returns an invalid tag", func() {
+      BeforeEach(func() {
+        fake := new(gitfakes.FakeRepository)
+
+        reference1 := plumbing.NewReferenceFromStrings("invalid","refs/tags/")
+        tags := storer.NewReferenceSliceIter([]*plumbing.Reference{reference1})
+
+        fake.TagsReturns(tags, nil)
+
+        //client = fake
+      })
+
+      It("returns the most recent major version", func() {
+        Expect(expectedErr).To(MatchError("invalid version"))
+        Expect(expectedVersion).To(nil)
+      })
+
+    })
+  //
+	//	Context("when git returns an error", func() {
+	//		BeforeEach(func() {
+  //      fake := new(gitfakes.FakeRepository)
+  //      fake.TagsReturns(nil, errors.New("some error"))
+  //
+	//			//client = fake
+	//		})
+  //
+	//		It("returns an error", func() {
+	//			Expect(expectedErr).To(MatchError("some error"))
+	//		})
+	//	})
 	})
 
-	Describe("CheckoutSubdir", func() {})
+	//Describe("CheckoutSubdir", func() {})
 })
